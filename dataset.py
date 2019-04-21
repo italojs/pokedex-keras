@@ -19,12 +19,12 @@ class Dataset():
 		self.shape = shape
 	
 	def generator(self, batch_size):
-		print("Gerando as imagens")
+		print("[INFO] Gerando as imagens")
 		# TODO: set it optional
 		aug = ImageDataGenerator(rotation_range=20, zoom_range=0.15,
 			width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15,
 			horizontal_flip=True, fill_mode="nearest")
-			
+		print("[INFO] Gerando as imagens")
 		return aug.flow(self.trainX, self.trainY, batch_size=batch_size)
 	
 	def save_labels(self, le_path):
