@@ -31,7 +31,15 @@ class Dataset():
 		f = open(le_path, "wb")
 		f.write(pickle.dumps(self.labelEncoder))
 		f.close()
-		
+
+def shuffle(matrix, target, test_proportion):
+    ratio = int(matrix.shape[0]/test_proportion) #should be int
+    X_train = matrix[ratio:,:]
+    X_test =  matrix[:ratio,:]
+    Y_train = target[ratio:,:]
+    Y_test =  target[:ratio,:]
+    return X_train, X_test, Y_train, Y_test
+
 def dataset_factory(dataset_path, input_shape, test_size=0.25, random_state=42):
 	print("[INFO] loading images...")
 	imagePaths = list(paths.list_images(dataset_path))
@@ -47,12 +55,11 @@ def dataset_factory(dataset_path, input_shape, test_size=0.25, random_state=42):
 		labels.append(label)
 
 	data = np.array(data, dtype="float") / 255.0
-
 	le = LabelEncoder()
 	labels = le.fit_transform(labels)
 	labels = np_utils.to_categorical(labels)
 
-	(trainX, testX, trainY, testY) = train_test_split(
-		data, labels, test_size=test_size, random_state=random_state)
+	(trainX, testX, trainY, testY) = shuffle(data, labels, 3)
+
 	return Dataset(trainX, testX, trainY, testY, le, input_shape)
 

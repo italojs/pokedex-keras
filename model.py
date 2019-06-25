@@ -61,7 +61,7 @@ class Resnet50():
 
     def add_stage(self, x, kernel_size, stride, filters, stage, blocks):
         x = self.__convolutional_block(x, kernel_size=kernel_size, stride=stride, filters=filters, stage=stage, block='0')
-        for block in blocks:
+        for block in range(blocks):
             x = self.__identity_block(x, kernel_size=kernel_size, filters=filters, stage=stage, block=str(block+1))
         return x
         
@@ -78,7 +78,6 @@ class Resnet50():
         
         x = self.add_stage(x, kernel_size=3, stride=1, filters=[64, 64, 256], stage=2, blocks=2)
         x = self.add_stage(x, kernel_size=3, stride=2, filters=[128, 128, 512], stage=3, blocks=3)
-        x = self.add_stage(x, kernel_size=3, stride=2, filters=[256, 256, 1024], stage=4, blocks=6)
         x = self.add_stage(x, kernel_size=3, stride=2, filters=[256, 256, 1024], stage=4, blocks=6)
         x = self.add_stage(x, kernel_size=3, stride=2, filters=[512, 512, 2048], stage=5, blocks=3)
 
