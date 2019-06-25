@@ -21,7 +21,7 @@ class Dataset():
 	def generator(self, batch_size):
 		# TODO: set it optional
 		print("[INFO] Image data generator...")		
-		aug = ImageDataGenerator(rotation_range=20, zoom_range=0.15,
+		aug = ImageDataGenerator(rotation_range=5, zoom_range=0.15,
 			width_shift_range=0.2, height_shift_range=0.2, shear_range=0.15,
 			horizontal_flip=True, fill_mode="nearest")
 		return aug.flow(self.trainX, self.trainY, batch_size=batch_size)
