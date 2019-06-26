@@ -81,10 +81,10 @@ class Resnet50():
         x = self.add_stage(x, kernel_size=3, stride=2, filters=[256, 256, 1024], stage=4, blocks=6)
         x = self.add_stage(x, kernel_size=3, stride=2, filters=[512, 512, 2048], stage=5, blocks=3)
 
-        x = GlobalAveragePooling2D(name='avg_pool')(x)
+        x = GlobalAveragePooling2D(name='average_pool')(x)
         
         x = Dense(units=classes, activation='softmax', name='fc' + str(classes))(x)
         
-        model = Model(inputs=x_input, outputs=x, name='myResNet50')
+        model = Model(inputs=x_input, outputs=x, name='model_resNet50')
         
         return model

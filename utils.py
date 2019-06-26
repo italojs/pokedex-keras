@@ -5,7 +5,7 @@ def get_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("-d", "--dataset", required=True,
         help="path to input dataset")
-    ap.add_argument("-m", "--model", default="liveness.model", type=str,
+    ap.add_argument("-m", "--model", default="resnet50.model", type=str,
         help="path to trained model")
     ap.add_argument("-l", "--le", default="le.pickle", type=str,
         help="path to label encoder")
