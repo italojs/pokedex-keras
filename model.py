@@ -11,80 +11,78 @@ from keras.layers import Add
 
 class Resnet50():
     def __identity_block(self, input_tensor, kernel_size, filters, stage, block):
-        f1, f2, f3 = filters
         bn_axis = 3
         
-        conv_name_base = 'res' + str(stage) + block + '_branch'
-        bn_name_base = 'bn' + str(stage) + block + '_branch'
+        conv_base_name = 'res' + str(stage) + block + '_branch'
+        bn_base_name = 'bn' + str(stage) + block + '_branch'
 
-        x = Conv2D(f1, kernel_size=(1, 1), name=conv_name_base + '2a')(input_tensor)
-        x = BatchNormalization(axis=bn_axis, name=bn_name_base + '2a')(x)
-        x = Activation('relu')(x)
+        arch = Conv2D(filters[0], kernel_size=(1, 1), name=conv_base_name + '2a')(input_tensor)
+        arch = BatchNormalization(axis=bn_axis, name=bn_base_name + '2a')(arch)
+        arch = Activation('relu')(arch)
 
-        x = Conv2D(f2, kernel_size, padding='same', name=conv_name_base + '2b')(x)
-        x = BatchNormalization(axis=bn_axis, name=bn_name_base + '2b')(x)
-        x = Activation('relu')(x)
+        arch = Conv2D(filters[1], kernel_size, padding='same', name=conv_base_name + '2b')(arch)
+        arch = BatchNormalization(axis=bn_axis, name=bn_base_name + '2b')(arch)
+        arch = Activation('relu')(arch)
 
-        x = Conv2D(f3, (1, 1), name=conv_name_base + '2c')(x)
-        x = BatchNormalization(axis=bn_axis, name=bn_name_base + '2c')(x)
+        arch = Conv2D(filters[2], (1, 1), name=conv_base_name + '2c')(arch)
+        arch = BatchNormalization(axis=bn_axis, name=bn_base_name + '2c')(arch)
 
-        x = Add()([x, input_tensor])
-        x = Activation('relu')(x)
+        arch = Add()([arch, input_tensor])
+        arch = Activation('relu')(arch)
         
-        return x
+        return arch
 
     def __convolutional_block(self, input_tensor, kernel_size, stride, filters, stage, block):
-        f1, f2, f3 = filters
         bn_axis = 3
         
-        conv_name_base = 'res' + str(stage) + block + '_branch'
-        bn_name_base = 'bn' + str(stage) + block + '_branch'
+        conv_base_name = 'res' + str(stage) + block + '_branch'
+        bn_base_name = 'bn' + str(stage) + block + '_branch'
         
-        x = Conv2D(f1, kernel_size=(1, 1), strides=(stride, stride), name=conv_name_base+'2a')(input_tensor)
-        x = BatchNormalization(axis=bn_axis, name=bn_name_base+'2a')(x)
-        x = Activation('relu')(x)
+        arch = Conv2D(filters[0], kernel_size=(1, 1), strides=(stride, stride), name=conv_base_name+'2a')(input_tensor)
+        arch = BatchNormalization(axis=bn_axis, name=bn_base_name+'2a')(arch)
+        arch = Activation('relu')(arch)
         
-        x = Conv2D(f2, kernel_size=(kernel_size, kernel_size), padding='same', name=conv_name_base+'2b')(x)
-        x = BatchNormalization(axis=bn_axis, name=bn_name_base+'2b')(x)
-        x = Activation('relu')(x)
+        arch = Conv2D(filters[1], kernel_size=(kernel_size, kernel_size), padding='same', name=conv_base_name+'2b')(arch)
+        arch = BatchNormalization(axis=bn_axis, name=bn_base_name+'2b')(arch)
+        arch = Activation('relu')(arch)
         
-        x = Conv2D(f3, kernel_size=(1, 1), name=conv_name_base+'2c')(x)
-        x = BatchNormalization(axis=bn_axis, name=bn_name_base+'2c')(x)
+        arch = Conv2D(filters[2], kernel_size=(1, 1), name=conv_base_name+'2c')(arch)
+        arch = BatchNormalization(axis=bn_axis, name=bn_base_name+'2c')(arch)
         
-        x_shortcut = Conv2D(f3, kernel_size=(1, 1), strides=(stride, stride), name=conv_name_base+'1')(input_tensor)
-        x_shortcut = BatchNormalization(axis=bn_axis, name=bn_name_base+'1')(x_shortcut)
+        arch_shortcut = Conv2D(filters[2], kernel_size=(1, 1), strides=(stride, stride), name=conv_base_name+'1')(input_tensor)
+        arch_shortcut = BatchNormalization(axis=bn_axis, name=bn_base_name+'1')(x_shortcut)
         
-        x = Add()([x, x_shortcut])
-        x = Activation('relu')(x)
+        arch = Add()([arch, arch_shortcut])
+        arch = Activation('relu')(arch)
         
-        return x
+        return arch
 
-    def add_stage(self, x, kernel_size, stride, filters, stage, blocks):
-        x = self.__convolutional_block(x, kernel_size=kernel_size, stride=stride, filters=filters, stage=stage, block='0')
+    def add_stage(self, arch, kernel_size, stride, filters, stage, blocks):
+        arch = self.__convolutional_block(arch, kernel_size=kernel_size, stride=stride, filters=filters, stage=stage, block='0')
         for block in range(blocks):
-            x = self.__identity_block(x, kernel_size=kernel_size, filters=filters, stage=stage, block=str(block+1))
-        return x
+            arch = self.__identity_block(arch, kernel_size=kernel_size, filters=filters, stage=stage, block=str(block+1))
+        return arch
         
     def build(self, classes):
-        x_input = Input((224, 224, 3), name='input_1')
+        model_input = Input((224, 224, 3), name='input')
 
-        x = ZeroPadding2D(padding=(3, 3), name='conv1_pad')(x_input)
+        arch = ZeroPadding2D(padding=(3, 3), name='pad_conv1')(model_input)
         
-        x = Conv2D(filters=64, kernel_size=(7, 7), strides=(2, 2), name='conv1')(x)
-        x = BatchNormalization(axis=3, name='bn_conv1')(x)
-        x = Activation('relu')(x)
-        x = ZeroPadding2D(padding=(1, 1), name='pool1_pad')(x)
-        x = MaxPool2D(pool_size=(3, 3), strides=(2, 2), name='max_pooling2d_1')(x)
+        arch = Conv2D(filters=64, kernel_size=(7, 7), strides=(2, 2), name='conv1')(arch)
+        arch = BatchNormalization(axis=3, name='bn_conv1')(arch)
+        arch = Activation('relu')(arch)
+        arch = ZeroPadding2D(padding=(1, 1), name='pad_pool1')(arch)
+        arch = MaxPool2D(pool_size=(3, 3), strides=(2, 2), name='max_pool2d_1')(arch)
         
-        x = self.add_stage(x, kernel_size=3, stride=1, filters=[64, 64, 256], stage=2, blocks=2)
-        x = self.add_stage(x, kernel_size=3, stride=2, filters=[128, 128, 512], stage=3, blocks=3)
-        x = self.add_stage(x, kernel_size=3, stride=2, filters=[256, 256, 1024], stage=4, blocks=6)
-        x = self.add_stage(x, kernel_size=3, stride=2, filters=[512, 512, 2048], stage=5, blocks=3)
+        arch = self.add_stage(arch, kernel_size=3, stride=1, filters=[64, 64, 256], stage=2, blocks=2)
+        arch = self.add_stage(arch, kernel_size=3, stride=2, filters=[128, 128, 512], stage=3, blocks=3)
+        arch = self.add_stage(arch, kernel_size=3, stride=2, filters=[256, 256, 1024], stage=4, blocks=6)
+        arch = self.add_stage(arch, kernel_size=3, stride=2, filters=[512, 512, 2048], stage=5, blocks=3)
 
-        x = GlobalAveragePooling2D(name='average_pool')(x)
+        arch = GlobalAveragePooling2D(name='average_pool')(arch)
         
-        x = Dense(units=classes, activation='softmax', name='fc' + str(classes))(x)
+        arch = Dense(units=classes, activation='softmax', name='fc' + str(classes))(arch)
         
-        model = Model(inputs=x_input, outputs=x, name='model_resNet50')
+        model = Model(inputs=model_input, outputs=arch, name='model_resNet50')
         
         return model
