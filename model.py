@@ -50,7 +50,7 @@ class Resnet50():
         arch = BatchNormalization(axis=bn_axis, name=bn_base_name+'2c')(arch)
         
         arch_shortcut = Conv2D(filters[2], kernel_size=(1, 1), strides=(stride, stride), name=conv_base_name+'1')(input_tensor)
-        arch_shortcut = BatchNormalization(axis=bn_axis, name=bn_base_name+'1')(x_shortcut)
+        arch_shortcut = BatchNormalization(axis=bn_axis, name=bn_base_name+'1')(arch_shortcut)
         
         arch = Add()([arch, arch_shortcut])
         arch = Activation('relu')(arch)
