@@ -3,17 +3,13 @@
 It's a resnet50 implementation using keras (TF as backend) to classify pokemons.
 
 # Results
-![]()
-![]()
-![]()
-![]()
-![]()
+![](examples/1.jpg)
 
 # Usage
 Download the dataset [Dataset](https://drive.google.com/open?id=1Y-h94ZxPN79ILOtwEjt3ZBmGT9769PyX)
 
 ### Train
-`python3 train.py --dataset dataset --model pokedex-keras/pokedex.model --le pokedex-keras/le.pickle -e 50`
+`python3 train.py --dataset ./dataset --model ./pokedex.model --le ./le.pickle -e 50`
 
 ##### Parameters:
 ```
@@ -37,7 +33,7 @@ optional arguments:
 ```
 
 ### Predict
- `python3 predict.py --image path/to/image.png --model trained.model --le le.pickle`
+ `python3 predict.py --image ./path/to/image.png --model ./path/to/trained.model --le ./path/to/le.pickle`
 
 ##### Parameters
 ```
@@ -53,6 +49,4 @@ optional arguments:
                         image to predict
 
 ```
-
-#### References
 
