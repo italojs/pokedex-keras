@@ -7,8 +7,8 @@ args = getArgs.train()
 
 batch_size = args["batch_size"]
 dataset = Dataset(args["dataset"])
-net = NeuralNetwork()
-net.train(dataset, args["learn_rate"], args["epochs"], batch_size)
-net.evaluate(dataset, batch_size)
+net = NeuralNetwork(args["epochs"], batch_size, args["learn_rate"], dataset)
+net.train()
+net.evaluate(dataset)
 net.save_model(args["model"])
 dataset.save_labels(args["le"])
